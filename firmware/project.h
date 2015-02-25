@@ -10,7 +10,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
-#include "display_name.h"
 
 #define RESET 0 // PB0
 #define CS 2 // PB2
@@ -19,18 +18,18 @@
 #define SCK 5 // PB5
 
 // ========== Define functions ============
-void ioinit(void); // Initializes IO
+void io_init(void); // Initializes IO
 void welcome();
 void complete();
-void verticalBarShow();
-void enableAndClear();
+void vertical_bar_show();
+void enable_and_clear();
 void vertical_bar(int upper, int lower);
 int sound_to_vbar(int threshold, int mic0, int mic1);
 void SPI_write(char address, char byte);
 char SPI_read(char address);
-void Initialize_ADC0(void);
-void Initialize_ADC1(void);
-int GetSound(int mic, int samples);
+void initialize_ADC0(void);
+void initialize_ADC1(void);
+int get_sound(int mic, int samples);
 void reset();
 // ========== End of Define ============
 
@@ -38,11 +37,11 @@ void reset();
  * Store, flash, and display names of author. This is not
  * done yet as we need to figure out the ASCII conversion.
  */
-void displayNames();
-void flashNames();
-void nameShow();
+void display_names();
+void flash_names();
+void name_show();
 
-void displayNames() {
+void display_names() {
     SPI_write(0x06, 37); // DMAL 1
     SPI_write(0x07, 0x1E); // T
     SPI_write(0x06, 38); // DMAL 2
@@ -73,64 +72,64 @@ void displayNames() {
     SPI_write(0x07, 0x32); // n
 }
 
-void flashNames() {
+void flash_names() {
     SPI_write(0x06, 37); // DMAL 1
     SPI_write(0x07, 0x1E); // T
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 38); // DMAL 2
     SPI_write(0x07, 0x2D); // i
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 39); // DMAL 3
     SPI_write(0x07, 0x32); // n
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 40); // DMAL 4
     SPI_write(0x07, 0x25); // a
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 42); // DMAL 5
     SPI_write(0x07, 0x1D); // S
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 43); // DMAL 6
     SPI_write(0x07, 0x31); // m
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 44); // DMAL 7
     SPI_write(0x07, 0x2D); // i
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 45); // DMAL 7
     SPI_write(0x07, 0x30); // l
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 46); // DMAL 7
     SPI_write(0x07, 0x2F); // k
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 47); // DMAL 8
     SPI_write(0x07, 0x37); // s
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 48); // DMAL 9
     SPI_write(0x07, 0x38); // t
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 49); // DMAL 10
     SPI_write(0x07, 0x29); // e
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 50); // DMAL 11
     SPI_write(0x07, 0x2D); // i
-    enableAndClear();
+    enable_and_clear();
     SPI_write(0x06, 51); // DMAL 12
     SPI_write(0x07, 0x32); // n
-    enableAndClear();
+    enable_and_clear();
 }
 
-void nameShow() {
-    flashNames(); // Flash letters
-    displayNames(); // Load entire name into max7456 memory
+void name_show() {
+    flash_names(); // Flash letters
+    display_names(); // Load entire name into max7456 memory
     SPI_write(0, 0x08); // Enable Display
     _delay_ms(3000);
     SPI_write(0x04, 0x06); // Clear Display on /VSync
     _delay_ms(500);
-    displayNames();
+    display_names();
     SPI_write(0, 0x08); // Enable Display
     _delay_ms(500);
     SPI_write(0x04, 0x06); // Clear Display on /VSync
     _delay_ms(500);
-    displayNames();
+    display_names();
     SPI_write(0, 0x08); // Enable Display
     _delay_ms(500);
     SPI_write(0x04, 0x06); // Clear Display on /VSync

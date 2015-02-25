@@ -9,7 +9,7 @@
 
 int main (void) {
     char x;
-    ioinit(); // Setup IO pins and defaults
+    io_init(); // Setup IO pins and defaults
     _delay_ms(1000);
     
     // === Reset ===
@@ -42,14 +42,14 @@ int main (void) {
     // ============================================
     
     /*
-     Initialize_ADC0();
-     int base_noise = GetSound(0, 1000);
+     initialize_ADC0();
+     int base_noise = get_sound(0, 1000);
      int threshold = base_noise + 30;
      */
-    Initialize_ADC0();
-    Initialize_ADC1();
+    initialize_ADC0();
+    initialize_ADC1();
     // Average
-    int base_noise = ((GetSound(0, 1000) + GetSound(1, 1000)) / 2);
+    int base_noise = ((get_sound(0, 1000) + get_sound(1, 1000)) / 2);
     int threshold = base_noise + 15, mic0 = 0, mic1 = 0;
     
     welcome();
@@ -60,7 +60,7 @@ int main (void) {
     while(1) {
         // If we wish to flash letters over display,
         // call this function.
-        // nameShow();
+        // name_show();
         
         // Single Vertical Bar Testing
         /*
@@ -77,7 +77,7 @@ int main (void) {
          */
         
         // Single Mic Testing
-        /* int mic0 = GetSound(0, 1000);
+        /* int mic0 = get_sound(0, 1000);
          if (mic0 > threshold) {
          vertical_bar(14, 28); // Middle
          SPI_write(0, 0x08);  // Enable Display of OSD image
@@ -88,8 +88,8 @@ int main (void) {
          */
         
         // Testing using two mics concurrently
-        mic0 = GetSound(0, 1000);
-        mic1 = GetSound(1, 1000);
+        mic0 = get_sound(0, 1000);
+        mic1 = get_sound(1, 1000);
         
         detect_sound = sound_to_vbar(threshold, mic0, mic1);
         
@@ -250,7 +250,7 @@ int sound_to_vbar(int threshold, int mic0, int mic1) {
     return detect_sound;
 }
 
-void ioinit (void) {
+void io_init (void) {
     UCSR0B = 0x00; // Disable Tx and Rx
     PORTB = 0xFF;
     DDRB = ((1<<CS) | (1<<MOSI) | (1<<SCK) | (1<<RESET));
@@ -315,7 +315,7 @@ void welcome() {
     _delay_ms(1000);
     SPI_write(0x04, 0x06); // Clear Display on /VSync
     _delay_ms(500);
-    verticalBarShow();
+    vertical_bar_show();
     _delay_ms(500);
     complete();
 }
@@ -373,135 +373,135 @@ void complete() {
     _delay_ms(500);
 }
 
-void verticalBarShow()
+void vertical_bar_show()
 {
     // Range of Vertical Bars from Left to Right:
     vertical_bar(0, 14); // Far Left
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(1, 15);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(2, 16);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(3, 17);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(4, 18);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(5, 19);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(6, 20);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(7, 21);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(8, 22);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(9, 23);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(10, 24);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(11, 25);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(12, 26);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(13, 27); // Left
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(14, 28); // Middle
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(15, 29); // Right
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(16, 0);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(17, 1);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(18, 2);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(19, 3);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(20, 4);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(21, 5);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(22, 6);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(23, 7);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(24, 8);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(25, 9);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(26, 10);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(27, 11);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(28, 12);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(29, 13); // Far Right
-    enableAndClear();
+    enable_and_clear();
     _delay_ms(250);
     
     // Range of vertical bars from right to left:
     vertical_bar(29, 13); // Far Right
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(28, 12);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(27, 11);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(26, 10);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(25, 9);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(24, 8);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(23, 7);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(22, 6);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(21, 5);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(20, 4);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(19, 3);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(18, 2);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(17, 1);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(16, 0);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(15, 29); // Right
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(14, 28); // Middle
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(13, 27); // Left
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(12, 26);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(11, 25);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(10, 24);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(9, 23);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(8, 22);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(7, 21);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(6, 20);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(5, 19);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(4, 18);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(3, 17);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(2, 16);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(1, 15);
-    enableAndClear();
+    enable_and_clear();
     vertical_bar(0, 14); // Far Left
-    enableAndClear();
+    enable_and_clear();
 }
 
-void enableAndClear() {
+void enable_and_clear() {
     SPI_write(0, 0x08); // Enable Display
     _delay_ms(100);
     SPI_write(0x04, 0x06); // Clear Display on /VSync
@@ -577,19 +577,19 @@ char SPI_read(char address) {
     return SPIData;
 }
 
-void Initialize_ADC0(void) {
+void initialize_ADC0(void) {
     ADCSRA = 0x87; // 10000111: pre-scaler set to CLK/128 = 125kHz
     ADCSRB = 0x00; // Turn gain and auto-trigger off
     ADMUX = 0x00; // Set ADC channel ADC1 with 1x gain
 }
 
-void Initialize_ADC1(void) {
+void initialize_ADC1(void) {
     ADCSRA = 0x87; // 10000111: pre-scaler set to CLK/128 = 125kHz
     ADCSRB = 0x00; // Turn gain and auto-trigger off
     ADMUX = 0x01; // Set ADC channel ADC1 with 1x gain
 }
 
-int GetSound(int mic, int samples) {
+int get_sound(int mic, int samples) {
     int i = 0;
     long sum = 0;
     for (i = 0; i < samples; i++) { // Take 1000 samples of the sound
