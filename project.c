@@ -11,6 +11,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include "display_name.h"
 
 #define RESET 0 // PB0
 #define CS 2 // PB2
@@ -22,12 +23,10 @@
 void ioinit(void); // Initializes IO
 void welcome();
 void complete();
-void tinaSmilkstein();
-void tinaSmillksteinCascade();
-void tinaShow();
 void verticalBarShow();
 void enableAndClear();
 void vertical_bar(int upper, int lower);
+bool sound_to_vbar(int threshold);
 void SPI_write(char address, char byte);
 char SPI_read(char address);
 void Initialize_ADC0(void);
@@ -82,9 +81,14 @@ int main (void) {
     int threshold = base_noise + 15, mic0 = 0, mic1 = 0;
 
     welcome();
+
+    // This flag is used to track sound. If there isn't sound
+    // detected, it would be set to false.
+    bool detect_sound = true;
     while(1) {
-        // Tina Smilkstein
-        // tinaShow();
+        // If we wish to flash letters over display,
+        // call this function.
+        // nameShow();
 
         // Single Vertical Bar Testing
         /*
@@ -99,7 +103,7 @@ int main (void) {
         SPI_write(0x04, 0x06); // Clear Display on /VSync
         _delay_ms(50);
         */
-        
+
         // Single Mic Testing
         /* int mic0 = GetSound(0, 1000);
         if (mic0 > threshold) {
@@ -115,216 +119,18 @@ int main (void) {
         mic0 = GetSound(0, 1000);
         mic1 = GetSound(1, 1000);
 
-        if ((mic0 > threshold) && (mic0 > (mic1 + 30))) {
-            vertical_bar(0, 14); // Far Left 
-            SPI_write(0, 0x08); // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display 
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 30))) { 
-            vertical_bar(29, 13); // Far Right 
-            SPI_write(0, 0x08); // Enable Display of OSD image 
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 28))) {
-            vertical_bar(1, 15); // Left Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 28))) {
-            vertical_bar(28, 12); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 26))) {
-            vertical_bar(2, 16); // Left Side
+        detect_sound = sound_to_vbar(threshold);
+
+        if (detect_sound) {
             SPI_write(0, 0x08); // Enable Display of OSD image
             _delay_ms(1000);
             SPI_write(0x04, 0x06); // Clear Display
             _delay_ms(500);
         }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 26))) {
-            vertical_bar(27, 11); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-             _delay_ms(1000);
-             SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 24))) {
-            vertical_bar(3, 17); // Left Side
-            SPI_write(0, 0x08); // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 24))) {
-            vertical_bar(26, 10); // Right Side
-            SPI_write(0, 0x08); // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 22))) {
-            vertical_bar(4, 18); // Left Side
-            SPI_write(0, 0x08); // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 22))) {
-            vertical_bar(25, 9); // Right Side
-            SPI_write(0, 0x08); // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 20))) {
-            vertical_bar(5, 19); // Left Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 20))) {
-            vertical_bar(24, 8); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 18))) {
-            vertical_bar(6, 20); // Left Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }      
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 18))) {
-              vertical_bar(23, 7); // Right Side 
-              SPI_write(0, 0x08); // Enable Display of OSD image 
-              _delay_ms(1000);
-              SPI_write(0x04, 0x06); // Clear Display 
-              _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 16))) {
-            vertical_bar(7, 21); // Left Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 16))) {
-            vertical_bar(22, 6); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 14))) {
-            vertical_bar(8, 22); // Left Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 14))) {
-            vertical_bar(21, 5); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 12))) {
-            vertical_bar(9, 23); // Left Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 12))) {
-            vertical_bar(20, 4); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 10))) {
-            vertical_bar(10, 24); // Left Side 
-            SPI_write(0, 0x08); // Enable Display of OSD image 
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display 
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 10))) {
-            vertical_bar(19, 3); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 8))) {
-            vertical_bar(11, 25); // Left Side 
-            SPI_write(0, 0x08); // Enable Display of OSD image 
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display 
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 8))) {
-            vertical_bar(18, 2); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 6))) { 
-            vertical_bar(12, 26); // Left Side 
-            SPI_write(0, 0x08); // Enable Display of OSD image 
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 6))) {
-            vertical_bar(17, 1); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 4))) {
-            vertical_bar(13, 27); // Left Side 
-            SPI_write(0, 0x08); // Enable Display of OSD image 
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display 
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 4))) {
-            vertical_bar(16, 0); // Right Side
-            SPI_write(0, 0x08);  // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
-        else if ((mic0 > threshold) && (mic0 > (mic1 + 2))) {
-            vertical_bar(14, 28);  // Left Side 
-            SPI_write(0, 0x08);    // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display 
-            _delay_ms(500);
-        }
-        else if ((mic1 > threshold) && (mic1 > (mic0 + 2))) {
-            vertical_bar(15, 29);  // Right Side
-            SPI_write(0, 0x08);    // Enable Display of OSD image
-            _delay_ms(1000);
-            SPI_write(0x04, 0x06); // Clear Display
-            _delay_ms(500);
-        }
+
+        // Prepare for next loop.
+        detect_sound = true;
+
     }
 }
 
@@ -368,6 +174,111 @@ void vertical_bar(int upper, int lower) {
     }
 }
 
+/*
+ * Determine whether there is sound by sorting the max
+ * sound directions and setting the vertical bar for
+ * display.
+ */
+bool sound_to_vbar(int threshold) {
+
+    bool detect_sound = true;
+
+    if ((mic0 > threshold) && (mic0 > (mic1 + 30)))
+        vertical_bar(0, 14); // Far Left
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 30)))
+        vertical_bar(29, 13); // Far Right
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 28)))
+        vertical_bar(1, 15); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 28)))
+        vertical_bar(28, 12); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 26)))
+        vertical_bar(2, 16); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 26)))
+        vertical_bar(27, 11); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 24)))
+        vertical_bar(3, 17); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 24)))
+        vertical_bar(26, 10); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 22)))
+        vertical_bar(4, 18); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 22)))
+        vertical_bar(25, 9); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 20)))
+        vertical_bar(5, 19); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 20)))
+        vertical_bar(24, 8); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 18)))
+        vertical_bar(6, 20); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 18)))
+          vertical_bar(23, 7); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 16)))
+        vertical_bar(7, 21); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 16)))
+        vertical_bar(22, 6); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 14)))
+        vertical_bar(8, 22); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 14)))
+        vertical_bar(21, 5); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 12)))
+        vertical_bar(9, 23); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 12)))
+        vertical_bar(20, 4); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 10)))
+        vertical_bar(10, 24); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 10)))
+        vertical_bar(19, 3); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 8)))
+        vertical_bar(11, 25); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 8)))
+        vertical_bar(18, 2); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 6)))
+        vertical_bar(12, 26); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 6)))
+        vertical_bar(17, 1); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 4)))
+        vertical_bar(13, 27); // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 4)))
+        vertical_bar(16, 0); // Right Side
+
+    else if ((mic0 > threshold) && (mic0 > (mic1 + 2)))
+        vertical_bar(14, 28);  // Left Side
+
+    else if ((mic1 > threshold) && (mic1 > (mic0 + 2)))
+        vertical_bar(15, 29);  // Right Side
+
+    else
+        detect_sound = false;
+
+    return detect_sound;
+}
+
 void ioinit (void) {
     UCSR0B = 0x00; // Disable Tx and Rx
     PORTB = 0xFF;
@@ -377,7 +288,7 @@ void ioinit (void) {
 
 void welcome() {
     SPI_write(0x05, 0x00); // DMAH Top Half of Screen
-    
+
     // WELCOME
     SPI_write(0x06, 161); // DMAL
     SPI_write(0x07, 0x21); // W
@@ -487,101 +398,6 @@ void complete() {
     SPI_write(0x07, 0x0F); // E
     SPI_write(0, 0x08); // Enable Display
     _delay_ms(1500);
-    SPI_write(0x04, 0x06); // Clear Display on /VSync
-    _delay_ms(500);
-}
-
-void tinaSmilkstein() {
-    SPI_write(0x06, 37); // DMAL 1
-    SPI_write(0x07, 0x1E); // T
-    SPI_write(0x06, 38); // DMAL 2
-    SPI_write(0x07, 0x2D); // i
-    SPI_write(0x06, 39); // DMAL 3
-    SPI_write(0x07, 0x32); // n
-    SPI_write(0x06, 40); // DMAL 4
-    SPI_write(0x07, 0x25); // a
-    SPI_write(0x06, 42); // DMAL 5
-    SPI_write(0x07, 0x1D); // S
-    SPI_write(0x06, 43); // DMAL 6
-    SPI_write(0x07, 0x31); // m
-    SPI_write(0x06, 44); // DMAL 7
-    SPI_write(0x07, 0x2D); // i
-    SPI_write(0x06, 45); // DMAL 7
-    SPI_write(0x07, 0x30); // l
-    SPI_write(0x06, 46); // DMAL 7
-    SPI_write(0x07, 0x2F); // k
-    SPI_write(0x06, 47); // DMAL 8
-    SPI_write(0x07, 0x37); // s
-    SPI_write(0x06, 48); // DMAL 9
-    SPI_write(0x07, 0x38); // t
-    SPI_write(0x06, 49); // DMAL 10
-    SPI_write(0x07, 0x29); // e
-    SPI_write(0x06, 50); // DMAL 11
-    SPI_write(0x07, 0x2D); // i
-    SPI_write(0x06, 51); // DMAL 12
-    SPI_write(0x07, 0x32); // n
-}
-
-void tinaSmillksteinCascade() {
-    SPI_write(0x06, 37); // DMAL 1
-    SPI_write(0x07, 0x1E); // T
-    enableAndClear();
-    SPI_write(0x06, 38); // DMAL 2
-    SPI_write(0x07, 0x2D); // i
-    enableAndClear();
-    SPI_write(0x06, 39); // DMAL 3
-    SPI_write(0x07, 0x32); // n
-    enableAndClear();
-    SPI_write(0x06, 40); // DMAL 4
-    SPI_write(0x07, 0x25); // a
-    enableAndClear();
-    SPI_write(0x06, 42); // DMAL 5
-    SPI_write(0x07, 0x1D); // S
-    enableAndClear();
-    SPI_write(0x06, 43); // DMAL 6
-    SPI_write(0x07, 0x31); // m
-    enableAndClear();
-    SPI_write(0x06, 44); // DMAL 7
-    SPI_write(0x07, 0x2D); // i
-    enableAndClear();
-    SPI_write(0x06, 45); // DMAL 7
-    SPI_write(0x07, 0x30); // l
-    enableAndClear();
-    SPI_write(0x06, 46); // DMAL 7
-    SPI_write(0x07, 0x2F); // k
-    enableAndClear();
-    SPI_write(0x06, 47); // DMAL 8
-    SPI_write(0x07, 0x37); // s
-    enableAndClear();
-    SPI_write(0x06, 48); // DMAL 9
-    SPI_write(0x07, 0x38); // t
-    enableAndClear();
-    SPI_write(0x06, 49); // DMAL 10
-    SPI_write(0x07, 0x29); // e
-    enableAndClear();
-    SPI_write(0x06, 50); // DMAL 11
-    SPI_write(0x07, 0x2D); // i
-    enableAndClear();
-    SPI_write(0x06, 51); // DMAL 12
-    SPI_write(0x07, 0x32); // n
-    enableAndClear();
-}
-
-void tinaShow() {
-    tinaSmillksteinCascade(); // Flash letters
-    tinaSmilkstein(); // Load entire name into max7456 memory
-    SPI_write(0, 0x08); // Enable Display
-    _delay_ms(3000);
-    SPI_write(0x04, 0x06); // Clear Display on /VSync
-    _delay_ms(500);
-    tinaSmilkstein();
-    SPI_write(0, 0x08); // Enable Display
-    _delay_ms(500);
-    SPI_write(0x04, 0x06); // Clear Display on /VSync
-    _delay_ms(500);
-    tinaSmilkstein();
-    SPI_write(0, 0x08); // Enable Display
-    _delay_ms(500);
     SPI_write(0x04, 0x06); // Clear Display on /VSync
     _delay_ms(500);
 }
