@@ -1,6 +1,48 @@
 # Art 89 Project: Visualization of Sound
 By Sharon Yang and Jiaxin Li
 
+Compile
+====
+
+Before attempt to compile, make sure you have AVR environment set up. The
+code is written in Mac environment. The AVR code base/platform can be found
+and downloaded here: http://www.obdev.at/products/crosspack/index.html.
+
+Download it, unpack and install it, and make sure you have set up properly
+by running "which avrdude" in command line.
+
+Currently, our code can be compiled when you go to firmware/ directory, and
+run:
+```
+make
+```
+
+It simply compiles the code we have and outputs metadata of our hardware:
+```
+avr-gcc -Wall -Os -DF_CPU=8000000 -mmcu=atmega328 -c main.c -o main.o
+avr-gcc -Wall -Os -DF_CPU=8000000 -mmcu=atmega328 -o main.elf main.o
+rm -f main.hex
+avr-objcopy -j .text -j .data -O ihex main.elf main.hex
+avr-size --format=avr --mcu=atmega328 main.elf
+AVR Memory Usage
+----------------
+Device: atmega328
+
+Program:    4612 bytes (14.1% Full)
+(.text + .data + .bootloader)
+
+Data:          0 bytes (0.0% Full)
+(.data + .bss + .noinit)
+```
+
+The code compiles, and we will later test it with hardware.
+
+The object files, etc., can be cleaned by running:
+```
+make clean
+```
+
+
 Description
 ====
 
